@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Dimensions, View, TouchableWithoutFeedback, Animated, Vibration } from 'react-native';
+import WinModal from "./WinModal";
 
 const number = 5;
 const Size = Dimensions.get('window');
@@ -9,6 +10,7 @@ const Cell = Math.floor(Width / (number + 2));
 export default class Grid extends React.Component {
     constructor(props) {
         super(props);
+        this.colorValue = [[], [], [], [], []];
         this.state = {
             grid: [
                 [0, 0, 0, 0, 0],
@@ -16,8 +18,9 @@ export default class Grid extends React.Component {
                 [0, 0, 1, 0, 0],
                 [0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0]
-            ]
-        }
+            ],
+            modalVisible: false
+        };
     }
 
     onPress(i, j) {
@@ -35,12 +38,55 @@ export default class Grid extends React.Component {
         if (j + 1 <= (number - 1)) {
             copy[i][j + 1] = +!copy[i][j + 1];
         }
-        this.setState({grid: copy})
+        this.colorChange(copy);
+        Vibration.vibrate(10);
+        this.winner();
+    }
+
+    colorChange(state) {
+        state.map((row, i) => {
+            row.map((grid, j) => {
+                Animated.timing(this.colorValue[i][j], {
+                    toValue: grid,
+                    duration: 300
+                }).start(() => {
+                    this.setState({grid: state});
+                });
+            })
+        })
+    }
+
+    setCellColor(i, j) {
+        this.colorValue[i][j] = new Animated.Value(this.state.grid[i][j]);
+        const color = this.colorValue[i][j].interpolate({
+            inputRange: [0, 1],
+            outputRange: ['#111', '#ffb400']
+        });
+        return(
+            <Animated.View style={[styles.cell, {backgroundColor: color}]}></Animated.View>
+        )
+    }
+
+    winner() {
+        let flatten = [].concat(...this.state.grid);
+        function notZero(value) {
+            return value > 0;
+        }
+        let win = flatten.every(notZero);
+        if (win) {
+            this.winModalVisible(true);
+        }
+    }
+
+    winModalVisible(visible) {
+        this.setState({modalVisible: visible});
     }
 
     render() {
+        console.log(this.state.modalVisible);
         return (
             <View style={styles.container}>
+                <WinModal visible={this.state.modalVisible} updateVisible={this.winModalVisible}/>
                 {
                     this.state.grid.map((row, i) => {
                         return(
@@ -48,9 +94,9 @@ export default class Grid extends React.Component {
                                 {
                                     row.map((grid, j) => {
                                         return(
-                                            <TouchableOpacity key={`grid${j}`} onPress={() => {this.onPress(i, j)}}>
-                                                <View style={this.state.grid[i][j] ? styles.illuminate : styles.grid}></View>
-                                            </TouchableOpacity>
+                                            <TouchableWithoutFeedback key={`grid${j}`} onPress={() => {this.onPress(i, j)}}>
+                                                {this.setCellColor(i, j)}
+                                            </TouchableWithoutFeedback>
                                         )
                                     })
                                 }
@@ -74,18 +120,10 @@ const styles = StyleSheet.create({
         width: (Cell + 10) * number,
         flexDirection: 'row'
     },
-    grid: {
+    cell: {
         width: Cell,
         height: Cell,
         borderRadius: 10,
-        backgroundColor: '#111',
         margin: 5,
     },
-    illuminate: {
-        width: Cell,
-        height: Cell,
-        borderRadius: 10,
-        backgroundColor: '#ffb400',
-        margin: 5,
-    }
 });
