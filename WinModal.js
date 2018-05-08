@@ -7,6 +7,12 @@ export default class WinModal extends React.Component {
     constructor(props) {
         super(props);
         this.updateVisible = this.props.updateVisible;
+        this.resetGame = this.props.resetGame;
+    }
+
+    pressReset() {
+        this.updateVisible(false);
+        this.resetGame();
     }
 
     render() {
@@ -14,7 +20,7 @@ export default class WinModal extends React.Component {
             <Modal transparent={true} visible={this.props.visible} onRequestClose={() => {}}>
                 <View style={styles.win} elevation={5}>
                     <Text style={styles.winText}>You Win!</Text>
-                    <Button title="Restart" color="#111" style={styles.button} onPress={() => {this.updateVisible(false)}}/>
+                    <Button title="Restart" color="#111" style={styles.button} onPress={this.pressReset.bind(this)}/>
                 </View>
             </Modal>
         )

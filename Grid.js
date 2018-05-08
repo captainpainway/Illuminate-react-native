@@ -82,11 +82,22 @@ export default class Grid extends React.Component {
         this.setState({modalVisible: visible});
     }
 
+    resetGame() {
+        this.setState({
+            grid: [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0]
+            ]
+        });
+    }
+
     render() {
-        console.log(this.state.modalVisible);
         return (
             <View style={styles.container}>
-                <WinModal visible={this.state.modalVisible} updateVisible={this.winModalVisible}/>
+                <WinModal visible={this.state.modalVisible} updateVisible={this.winModalVisible.bind(this)} resetGame={this.resetGame.bind(this)}/>
                 {
                     this.state.grid.map((row, i) => {
                         return(
