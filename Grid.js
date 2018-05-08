@@ -23,6 +23,21 @@ export default class Grid extends React.Component {
         };
     }
 
+    componentDidMount() {
+        this.randomizeLights();
+    }
+
+    randomizeLights() {
+        let grid = [[], [], [], [], []];
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+                let rand = Math.round(Math.random());
+                grid[i].push(rand);
+            }
+        }
+        this.setState({grid: grid});
+    }
+
     onPress(i, j) {
         let copy = this.state.grid.slice();
         copy[i][j] = +!copy[i][j];
@@ -48,7 +63,7 @@ export default class Grid extends React.Component {
             row.map((grid, j) => {
                 Animated.timing(this.colorValue[i][j], {
                     toValue: grid,
-                    duration: 300
+                    duration: 250
                 }).start(() => {
                     this.setState({grid: state});
                 });
@@ -83,15 +98,7 @@ export default class Grid extends React.Component {
     }
 
     resetGame() {
-        this.setState({
-            grid: [
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 1, 0, 0],
-                [0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0]
-            ]
-        });
+        this.randomizeLights();
     }
 
     render() {
