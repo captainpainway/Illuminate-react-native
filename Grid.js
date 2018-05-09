@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Dimensions, View, TouchableWithoutFeedback, Animated, Vibration } from 'react-native';
 import WinModal from "./WinModal";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const number = 5;
 const Size = Dimensions.get('window');
@@ -104,6 +105,7 @@ export default class Grid extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                <Icon name="settings" size={40} style={styles.settings} />
                 <WinModal visible={this.state.modalVisible} updateVisible={this.winModalVisible.bind(this)} resetGame={this.resetGame.bind(this)}/>
                 {
                     this.state.grid.map((row, i) => {
@@ -144,4 +146,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 5,
     },
+    settings: {
+        color: '#999999',
+        position: 'absolute',
+        top: 30,
+        right: 10,
+    }
 });
